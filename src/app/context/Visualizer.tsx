@@ -1,7 +1,7 @@
 "use client";
 
 import { AlgorithmType, AnimationArrayType } from "@/lib/types";
-import { generateRandomNumberFromInterval, MAX_ANIMATION_SPEED } from "@/lib/utils";
+import { generateRandomNumberFromInterval, MAX_ANIMATION_SPEED, MIN_ANIMATION_SPEED } from "@/lib/utils";
 import { createContext, useContext, useEffect, useState } from "react";
 
 interface AlgorithmVisualizerContextType {
@@ -32,7 +32,7 @@ export const AlgorithmVisualizerProvider = ({children} : {children: React.ReactN
     // Array of ALgorithm Types
     const [algorithmSelected, setAlgorithmSelected] = useState<AlgorithmType>("bubble");
     // Animation speed
-    const [animationSpeed, setAnimationSpeed] = useState<number>(MAX_ANIMATION_SPEED);
+    const [animationSpeed, setAnimationSpeed] = useState<number>(MIN_ANIMATION_SPEED);
     // Animation is running
     const [isAnimationRunning, setIsAnimationRunning] = useState<boolean>(false);
     // Animations is completed
@@ -134,19 +134,19 @@ export const AlgorithmVisualizerProvider = ({children} : {children: React.ReactN
 
         // Final 'pulse' animation
         const finalTimeout = animations.length * inverseSpeed + 20; // animation is over
-
+        
         setTimeout(() => {
             Array.from(arrayLines).forEach((line) => {
                 line.classList.add("pulse-animation", "changed-line-color");
                 line.classList.remove("default-line-color");
             });
+            setIsAnimationRunning(false);
+            setIsAnimationCompleted(true);
             setTimeout(() => {
                 Array.from(arrayLines).forEach((line) => {
                     line.classList.remove("pulse-animation", "changed-line-color");
                     line.classList.add("default-line-color");
                 });
-                setIsAnimationRunning(false);
-                setIsAnimationCompleted(true);
             }, 1000);
         }, finalTimeout);
     };

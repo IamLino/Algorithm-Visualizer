@@ -127,7 +127,10 @@ export default function Home() {
               {arrayToSort.map((value, index) => (
                 <div className="array-line relative w-1 mx-0.5 shadow-lg opacity-70 rounded-lg default-line-color" 
                 key={index}
-                style={{height: `${value}px`}}>
+                style={{
+                  height: `${value}px`,
+                  transition: `height 0.${(1/animationSpeed) * 200}s ease`
+                }}>
                   
                 </div>
               ))}
