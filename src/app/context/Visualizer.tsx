@@ -85,7 +85,7 @@ export const AlgorithmVisualizerProvider = ({children} : {children: React.ReactN
         setTimeout(() => {
             const arrayLines = document.getElementsByClassName("array-line") as HTMLCollectionOf<HTMLElement>;
             for(let i = 0; i < arrayLines.length; i++){
-                arrayLines[i].classList.remove("changed-line-color");
+                arrayLines[i].classList.remove("pulse-animation", "changed-line-color");
                 arrayLines[i].classList.add("default-line-color");
             }
         }, 0);
