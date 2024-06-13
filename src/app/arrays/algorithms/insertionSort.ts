@@ -1,4 +1,4 @@
-import { AnimationArrayType } from "@/lib/types";
+import { AnimationArrayType } from "../lib/arrayTypes";
 
 function runInsertionSort(array: number[], animations: AnimationArrayType) {
     for (let i = 1; i < array.length; i++) {

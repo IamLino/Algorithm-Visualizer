@@ -1,18 +1,15 @@
-import { generateBubbleSortAnimationArray } from "@/algorithms/bubbleSort";
-import { AlgorithmSelectorOptions, AlgorithmType, AnimationArrayType } from "./types";
-import { generateSelectionSortAnimationArray } from "@/algorithms/selectionSort";
-import { generateInsertionSortAnimationArray } from "@/algorithms/insertionSort";
-import { generateMergeSortAnimationArray } from "@/algorithms/mergeSort";
-import { generateQuickSortAnimationArray } from "@/algorithms/quickSort";
+// General types
+import { AlgorithmData, AlgorithmSelectorOptions } from "@/app/lib/types";
+// Array types
+import { SortingAlgorithmType, AnimationArrayType } from "./arrayTypes";
+// Algorithms
+import { generateBubbleSortAnimationArray } from "@/app/arrays/algorithms/bubbleSort";
+import { generateSelectionSortAnimationArray } from "@/app/arrays/algorithms/selectionSort";
+import { generateInsertionSortAnimationArray } from "@/app/arrays/algorithms/insertionSort";
+import { generateMergeSortAnimationArray } from "@/app/arrays/algorithms/mergeSort";
+import { generateQuickSortAnimationArray } from "@/app/arrays/algorithms/quickSort";
 
-export const MIN_ANIMATION_SPEED = 40;
-export const MAX_ANIMATION_SPEED = 400;
-
-export function generateRandomNumberFromInterval(min: number, max: number): number {
-  return Math.floor(Math.random() * (max - min + 1) + min);
-}
-
-export const algorithmSelectorOptions: AlgorithmSelectorOptions[] = [
+export const sortingAlgorithmSelectorOptions: AlgorithmSelectorOptions[] = [
   { label: "Bubble", value: "bubble" },
   { label: "Quick", value: "quick" },
   { label: "Merge", value: "merge" },
@@ -20,8 +17,8 @@ export const algorithmSelectorOptions: AlgorithmSelectorOptions[] = [
   { label: "Selection", value: "selection" },
 ];
 
-export function generateAnimationArray(
-  selectedAlgorithm: AlgorithmType,
+export function generateSortingAnimationArray(
+  selectedAlgorithm: SortingAlgorithmType,
   isAnimationRunning: boolean,
   array: number[],
   runAnimation: (animations: AnimationArrayType) => void
@@ -47,7 +44,7 @@ export function generateAnimationArray(
   };
 };
 
-export const algorithmsData = {
+export const sortingAlgorithmsData: { [key: string]: AlgorithmData } = {
   bubble: {
     title: "Bubble Sort",
     description:

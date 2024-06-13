@@ -1,15 +1,19 @@
 "use client";
 
-import { AlgorithmType, AnimationArrayType } from "@/lib/types";
-import { generateRandomNumberFromInterval, MAX_ANIMATION_SPEED, MIN_ANIMATION_SPEED } from "@/lib/utils";
+// <----------- Imports ----------->
+// General
 import { createContext, useContext, useEffect, useState } from "react";
+import { generateRandomNumberFromInterval, MAX_ANIMATION_SPEED, MIN_ANIMATION_SPEED } from "@/app/lib/utils";
+// Array types
+import { SortingAlgorithmType, AnimationArrayType } from "@/app/arrays/lib/arrayTypes";
+// <-----------/Imports ----------->
 
-interface AlgorithmVisualizerContextType {
+interface SortingVisualizerContextType {
    // States
    arrayToSort: number[];
    setArrayToSort: (array: number[]) => void;
-   algorithmSelected: AlgorithmType;
-   setAlgorithmSelected: (algorithm: AlgorithmType) => void;
+   sortingAlgorithmSelected: SortingAlgorithmType;
+   setSortingAlgorithmSelected: (sortingAlgorithm: SortingAlgorithmType) => void;
    animationSpeed: number;
    setAnimationSpeed: (speed: number) => void;
    isAnimationRunning: boolean;
@@ -19,18 +23,18 @@ interface AlgorithmVisualizerContextType {
    requiresReset: boolean;
    // Functions
    resetArrayAndAnimation: () => void;
-   runAnimation: (animations: AnimationArrayType) => void;
+   runSortingAnimation: (animations: AnimationArrayType) => void;
 }
 
-const AlgorithmVisualizerContext = createContext<AlgorithmVisualizerContextType | undefined>(undefined);
+const SortingVisualizerContext = createContext<SortingVisualizerContextType | undefined>(undefined);
 
 // Provider
-export const AlgorithmVisualizerProvider = ({children} : {children: React.ReactNode}) => {
+export const SortingVisualizerProvider = ({children} : {children: React.ReactNode}) => {
     // <---------- States ---------->
     // Array of numbers
     const [arrayToSort, setArrayToSort] = useState<number []>([]);
     // Array of ALgorithm Types
-    const [algorithmSelected, setAlgorithmSelected] = useState<AlgorithmType>("bubble");
+    const [sortingAlgorithmSelected, setSortingAlgorithmSelected] = useState<SortingAlgorithmType>("bubble");
     // Animation speed
     const [animationSpeed, setAnimationSpeed] = useState<number>(MIN_ANIMATION_SPEED);
     // Animation is running
@@ -91,7 +95,7 @@ export const AlgorithmVisualizerProvider = ({children} : {children: React.ReactN
         }, 0);
     };
 
-    const runAnimation = (animations: AnimationArrayType) => {
+    const runSortingAnimation = (animations: AnimationArrayType) => {
         // ---> States
         setIsAnimationRunning(true);
         
@@ -133,7 +137,7 @@ export const AlgorithmVisualizerProvider = ({children} : {children: React.ReactN
         });
 
         // Final 'pulse' animation
-        const finalTimeout = animations.length * inverseSpeed + 20; // animation is over
+        const finalTimeout = animations.length * inverseSpeed + 50; // animation is over
         
         setTimeout(() => {
             Array.from(arrayLines).forEach((line) => {
@@ -156,8 +160,8 @@ export const AlgorithmVisualizerProvider = ({children} : {children: React.ReactN
         // States
         arrayToSort,
         setArrayToSort,
-        algorithmSelected,
-        setAlgorithmSelected,
+        sortingAlgorithmSelected,
+        setSortingAlgorithmSelected,
         animationSpeed,
         setAnimationSpeed,
         isAnimationRunning,
@@ -168,19 +172,19 @@ export const AlgorithmVisualizerProvider = ({children} : {children: React.ReactN
         requiresReset,
         // Functions
         resetArrayAndAnimation,
-        runAnimation
+        runSortingAnimation
     }
 
     // Return the Provider on our context
-    return <AlgorithmVisualizerContext.Provider value={value}>{children}</AlgorithmVisualizerContext.Provider>;
+    return <SortingVisualizerContext.Provider value={value}>{children}</SortingVisualizerContext.Provider>;
 }
 
 // Create Context
-export const useAlgorithmVisualizerContext = () => {
-    const context = useContext(AlgorithmVisualizerContext);
+export const useSortingVisualizerContext = () => {
+    const context = useContext(SortingVisualizerContext);
     
     if(!context){
-        throw new Error("useAlgorithmVisualizerContext must be within a AlgorithmVisualizerProvider");
+        throw new Error("useSortingVisualizerContext must be within a SortingVisualizerProvider");
     }
 
     return context;

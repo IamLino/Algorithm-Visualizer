@@ -1,15 +1,10 @@
 // String union of all the sorting algorithm's
-export type AlgorithmType = 
+export type SortingAlgorithmType = 
     | "bubble"
     | "insertion"
     | "selection"
     | "merge"
     | "quick";
-
-export type AlgorithmSelectorOptions ={
-    value: string;
-    label: string;
-}
 
 /*
  * Boolean: Determines whether we swapping the line items
