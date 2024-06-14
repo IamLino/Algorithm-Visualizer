@@ -1,6 +1,6 @@
 // <----------- Imports ----------->
 // Graph
-import { Grid, NodeType, Node } from "../graphTypes";
+import { Grid, NodeType, Node, NodeDirection } from "../graphTypes";
 // Animation Types
 import { AnimationSearchType } from "./animationTypes";
 // <-----------/Imports ----------->
@@ -18,4 +18,27 @@ export function reconstructPath(
   }
   path.reverse();
   animations.shortestPath = path;
+}
+
+export function getNodeDirection(node: Node, targetNode: Node): NodeDirection {
+  // Up
+  if (targetNode.rowIndex < node.rowIndex) {
+    return NodeDirection.Up;
+  }
+  // Left or Right
+  if (targetNode.rowIndex == node.rowIndex) {
+    if (targetNode.columnIndex < node.columnIndex) {
+      return NodeDirection.Left;
+    }
+    if (targetNode.columnIndex > node.columnIndex) {
+      return NodeDirection.Right;
+    }
+  }
+  // Down
+  if (targetNode.rowIndex > node.rowIndex) {
+    return NodeDirection.Down;
+  }
+
+  // Left by default
+  return NodeDirection.Left;
 }

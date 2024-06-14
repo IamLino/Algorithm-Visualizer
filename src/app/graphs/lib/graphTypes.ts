@@ -1,3 +1,10 @@
+export enum NodeDirection{
+    Up,
+    Down,
+    Left,
+    Right
+}
+
 export enum NodeType {
     Normal,
     Start,

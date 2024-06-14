@@ -19,6 +19,7 @@ import {
 } from "../lib/graphUtils";
 // Animation
 import { SearchAlgorithmType } from "../lib/animations/animationTypes";
+import { updateSearchPath } from "../animations/grid/gridAnimations";
 // <-----------/Imports ----------->
 
 export default function PathfinderVisualizer() {
@@ -44,7 +45,8 @@ export default function PathfinderVisualizer() {
     clearWallsAndGrid,
     clearSearchPath,
     // Animation
-    runSearchAnimation
+    runSearchAnimation,
+    stopAnimation
   } = usePathfinderVisualizerContext();
 
   // -----> Handle functions <-----
@@ -54,17 +56,17 @@ export default function PathfinderVisualizer() {
     setSearchAlgorithmSelected(e.target.value as SearchAlgorithmType);
     clearSearchPath();
     setIsAnimationCompleted(false);
-    // resetGridAndAnimation();
   };
 
   const handleSearch = () => {
     if(isAnimationRunning){
-
+      // Stop animation
+      stopAnimation();
+      return;
     }
     // If the animation is completed clear the path
     if (isAnimationCompleted) {
       clearSearchPath();
-      // resetGridAndAnimation();
       setIsAnimationCompleted(false);
       return;
     }

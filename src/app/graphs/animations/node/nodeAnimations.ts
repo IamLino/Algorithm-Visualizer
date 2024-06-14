@@ -1,14 +1,27 @@
-import { Node, NodeType } from "@/app/graphs/lib/graphTypes";
+import { Node, NodeDirection, NodeType } from "@/app/graphs/lib/graphTypes";
 
 export default function updateNodeClassName(
   node: Node,
   isVisited: boolean = false,
-  isShortestPath: boolean = false
+  isShortestPath: boolean = false,
+  isAnimationRunning: boolean = false
 ) {
   const nodeId = `node-${node.rowIndex}-${node.columnIndex}`;
   const nodeElement = document.getElementById(nodeId) as HTMLElement;
   if (nodeElement) {
-    nodeElement.className = getNodeClassName(node.type, isVisited, isShortestPath);
+    nodeElement.className = getNodeClassName(
+      node.type,
+      isVisited,
+      isShortestPath,
+      isAnimationRunning
+    );
+    if (
+      node.type == NodeType.Wall ||
+      node.type == NodeType.Unreachable ||
+      node.type == NodeType.Normal
+    ) {
+      nodeElement.style.backgroundImage = "none";
+    }
     const nodeWeightId = nodeId + "-weight";
     const nodeWeightElement = document.getElementById(
       nodeWeightId
@@ -42,26 +55,46 @@ export function getNodeWeightText(weight: number, nodeType: NodeType): string {
 export function getNodeClassName(
   nodeType: NodeType,
   isVisited: boolean = false,
-  isShortestPath: boolean = false
+  isShortestPath: boolean = false,
+  isAnimationRunning: boolean = false
 ): string {
   let nodeClass = "node ";
   switch (nodeType) {
     case NodeType.Normal:
+      nodeClass += "node-normal ";
       if (isVisited) {
-        nodeClass += "node-visited";
-        return nodeClass;
+        nodeClass += "node-visited ";
       }
       if (isShortestPath) {
-        nodeClass += "node-shortest-path";
-        return nodeClass;
+        nodeClass += "node-shortest-path ";
       }
-      nodeClass += "node-normal";
+      if (!isAnimationRunning) {
+        nodeClass += "stopped ";
+      }
       break;
     case NodeType.Start:
-      nodeClass += "node-start";
+      nodeClass += "node-start ";
+      if (isVisited) {
+        nodeClass += "node-visited ";
+      }
+      if (isShortestPath) {
+        nodeClass += "node-shortest-path ";
+      }
+      if (!isAnimationRunning) {
+        nodeClass += "stopped ";
+      }
       break;
     case NodeType.Target:
-      nodeClass += "node-target";
+      nodeClass += "node-target ";
+      if (isVisited) {
+        nodeClass += "node-visited ";
+      }
+      if (isShortestPath) {
+        nodeClass += "node-shortest-path ";
+      }
+      if (!isAnimationRunning) {
+        nodeClass += "stopped ";
+      }
       break;
     case NodeType.Wall:
       nodeClass += "node-wall";
@@ -77,4 +110,40 @@ export function getNodeClassName(
       break;
   }
   return nodeClass;
+}
+
+export function updateStartNodeImgDirection(
+  startNode: Node,
+  direction: NodeDirection
+): void {
+  const nodeId = `node-${startNode.rowIndex}-${startNode.columnIndex}`;
+  const nodeElement = document.getElementById(nodeId) as HTMLElement;
+  if (nodeElement) {
+    switch (direction) {
+      case NodeDirection.Left:
+        nodeElement.style.backgroundImage = "url('/start_left.svg')";
+        break;
+      case NodeDirection.Right:
+        nodeElement.style.backgroundImage = "url('/start_right.svg')";
+        break;
+      case NodeDirection.Up:
+        nodeElement.style.backgroundImage = "url('/start_up.svg')";
+        break;
+      case NodeDirection.Down:
+        nodeElement.style.backgroundImage = "url('/start_down.svg')";
+        break;
+      default:
+        // Left by default
+        nodeElement.style.backgroundImage = "url('/start_left.svg')";
+        break;
+    }
+  }
+}
+
+export function updateTargetNodeImg(targetNode: Node): void {
+  const nodeId = `node-${targetNode.rowIndex}-${targetNode.columnIndex}`;
+  const nodeElement = document.getElementById(nodeId) as HTMLElement;
+  if (nodeElement) {
+    nodeElement.style.backgroundImage = "url('/target.svg')";
+  }
 }
