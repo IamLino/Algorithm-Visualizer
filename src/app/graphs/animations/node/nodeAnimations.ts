@@ -15,7 +15,9 @@ export default function updateNodeClassName(
       isShortestPath,
       isAnimationRunning
     );
-    if (
+    if (node.type == NodeType.Weight) {
+      updateWeightNodeImg(node);
+    } else if (
       node.type == NodeType.Wall ||
       node.type == NodeType.Unreachable ||
       node.type == NodeType.Normal
@@ -97,16 +99,25 @@ export function getNodeClassName(
       }
       break;
     case NodeType.Wall:
-      nodeClass += "node-wall";
+      nodeClass += "node-wall ";
       break;
     case NodeType.Weight:
-      nodeClass += "node-weight";
+      nodeClass += "node-weight ";
+      if (isVisited) {
+        nodeClass += "node-visited ";
+      }
+      if (isShortestPath) {
+        nodeClass += "node-shortest-path ";
+      }
+      if (!isAnimationRunning) {
+        nodeClass += "stopped ";
+      }
       break;
     case NodeType.Unreachable:
-      nodeClass += "node-unreachable";
+      nodeClass += "node-unreachable ";
       break;
     default:
-      nodeClass += "node-normal";
+      nodeClass += "node-normal ";
       break;
   }
   return nodeClass;
@@ -145,5 +156,21 @@ export function updateTargetNodeImg(targetNode: Node): void {
   const nodeElement = document.getElementById(nodeId) as HTMLElement;
   if (nodeElement) {
     nodeElement.style.backgroundImage = "url('/target.svg')";
+  }
+}
+
+export function updateWeightNodeImg(weightNode: Node): void {
+  const nodeId = `node-${weightNode.rowIndex}-${weightNode.columnIndex}`;
+  const nodeElement = document.getElementById(nodeId) as HTMLElement;
+  if (nodeElement) {
+    nodeElement.style.backgroundImage = "url('/weight.svg')";
+  }
+}
+
+export function removeBackgroundImg(row: number, column: number): void {
+  const nodeId = `node-${row}-${column}`;
+  const nodeElement = document.getElementById(nodeId) as HTMLElement;
+  if (nodeElement) {
+    nodeElement.style.backgroundImage = "none";
   }
 }

@@ -5,7 +5,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { MAX_ANIMATION_SPEED, MIN_ANIMATION_SPEED } from "@/app/lib/utils";
 // Graph
-import { Grid, Node, NodeType } from "../lib/graphTypes";
+import { Grid, Node, NodeType, NodeWeightValue } from "../lib/graphTypes";
 import { generateSearchAnimation } from "../lib/graphUtils";
 // Animation
 import {
@@ -17,7 +17,10 @@ import {
   clearGrid,
   updateSearchPath,
 } from "../animations/grid/gridAnimations";
-import { updateStartNodeImgDirection } from "../animations/node/nodeAnimations";
+import {
+  removeBackgroundImg,
+  updateStartNodeImgDirection,
+} from "../animations/node/nodeAnimations";
 import { getNodeDirection } from "../lib/animations/animationUtils";
 // <-----------/Imports ----------->
 
@@ -34,8 +37,16 @@ interface PathfinderVisualizerContextType {
   setIsWeightValueShown: (showWeight: boolean) => void;
   isMousePressed: boolean;
   setIsMousePressed: (mousePressed: boolean) => void;
+  isWeightKeyPressed: boolean;
+  setIsWeightKeyPressed: (isPressed: boolean) => void;
   lastMousePressedPosition: [number, number];
   setLastMousePressedPosition: (mousePosition: [number, number]) => void;
+  isStartNodeDragged: boolean;
+  setIsStartNodeDragged: (isDragged: boolean) => void;
+  isUpdateNode: boolean;
+  setIsUpdateNode: (update: boolean) => void;
+  previousNode: Node | null;
+  setPreviousNode: (node: Node | null) => void;
   // Animation
   animationSpeed: number;
   setAnimationSpeed: (speed: number) => void;
@@ -55,6 +66,7 @@ interface PathfinderVisualizerContextType {
   stopAnimation: () => void;
   // Node
   updateNode: (rowIndex: number, columnIndex: number) => void;
+  updateStartOrTargetNode: (rowIndex: number, columnIndex: number) => void;
 }
 
 const PathfinderVisualizerContext = createContext<
@@ -89,6 +101,13 @@ export const PathfinderVisualizerProvider = ({
   const [lastMousePressedPosition, setLastMousePressedPosition] = useState<
     [number, number]
   >([Infinity, Infinity]);
+  // Add weight key
+  const [isWeightKeyPressed, setIsWeightKeyPressed] = useState<boolean>(false);
+  // Start & Target Dragged
+  const [isStartNodeDragged, setIsStartNodeDragged] = useState<boolean>(false);
+  const [isUpdateNode, setIsUpdateNode] = useState<boolean>(false);
+  // Previous Node
+  const [previousNode, setPreviousNode] = useState<Node | null>(null);
   // <----------/States ---------->
 
   // Flag that determines whether
@@ -166,6 +185,7 @@ export const PathfinderVisualizerProvider = ({
     // ---> Variables
     // Because if the speed increases we need to go slower (wait less)
     const inverseSpeed = (1 / animationSpeed) * 3000;
+    let shortestPathCost = 0;
 
     // ---> Utility functions
     const updateNodeClass = (
@@ -179,7 +199,6 @@ export const PathfinderVisualizerProvider = ({
         if (isVisited) {
           nodeElement.className = "node node-visited";
         } else {
-          // Update the weight
           nodeElement.className = "node node-shortest-path";
         }
         if (runAnimation) {
@@ -208,6 +227,11 @@ export const PathfinderVisualizerProvider = ({
     const shortestPathTimeout = animations.shortestPath.length * inverseSpeed;
     setTimeout(() => {
       animations.shortestPath.forEach((node, index) => {
+        let additionalWeight = 1;
+        if (node.type == NodeType.Weight) {
+          additionalWeight += NodeWeightValue;
+        }
+        shortestPathCost += additionalWeight;
         setTimeout(() => {
           updateNodeClass(node, false, isAnimationRunning);
           // After the start node
@@ -260,13 +284,29 @@ export const PathfinderVisualizerProvider = ({
     if (isAnimationRunning && !isAnimationCompleted) return;
 
     // If the current node is a wall remove it, if its not then add it
+    const existingWeight = grid.weights.find(
+      (weight) =>
+        weight.rowIndex === rowIndex && weight.columnIndex === columnIndex
+    );
     const existingWall = grid.walls.find(
       (wall) => wall.rowIndex === rowIndex && wall.columnIndex === columnIndex
     );
+
     if (existingWall) {
       grid.removeWall(rowIndex, columnIndex);
     } else {
-      grid.addWall(rowIndex, columnIndex);
+      if (!existingWeight && !isWeightKeyPressed) {
+        grid.addWall(rowIndex, columnIndex);
+      }
+    }
+
+    if (existingWeight) {
+      grid.removeWeight(rowIndex, columnIndex);
+      // removeBackgroundImg(rowIndex, columnIndex);
+    } else {
+      if (!existingWall && isWeightKeyPressed) {
+        grid.addWeight(rowIndex, columnIndex);
+      }
     }
 
     // If the animation is completed just update the path
@@ -277,6 +317,90 @@ export const PathfinderVisualizerProvider = ({
       // if (grid.targetNode.weight === Infinity) {
       //   return;
       // }
+      generateSearchAnimation(
+        searchAlgorithmSelected,
+        isAnimationRunning,
+        grid,
+        updateSearchAnimation
+      );
+    }
+  };
+
+  const updateStartOrTargetNode = (rowIndex: number, columnIndex: number) => {
+    if (
+      previousNode?.rowIndex == rowIndex &&
+      previousNode?.columnIndex == columnIndex
+    ) {
+      return;
+    }
+    // Update the grid
+    // If the current node is a wall remove it, if its not then add it
+    const existingWeight = grid.weights.find(
+      (weight) =>
+        weight.rowIndex === rowIndex && weight.columnIndex === columnIndex
+    );
+    const existingWall = grid.walls.find(
+      (wall) => wall.rowIndex === rowIndex && wall.columnIndex === columnIndex
+    );
+
+    if (existingWall) {
+      grid.removeWall(rowIndex, columnIndex);
+    }
+
+    if (existingWeight) {
+      grid.removeWeight(rowIndex, columnIndex);
+    }
+    // If the node dragged is not start then is target
+    const newNode = new Node(rowIndex, columnIndex);
+
+    if (isStartNodeDragged) {
+      // Start
+      if (
+        grid.isSameNodePosition(grid.startNode, newNode) || // Nothing to update
+        grid.isSameNodePosition(grid.targetNode, newNode) // Cannot set targetNode as startNode
+      ) {
+        return;
+      }
+      grid.updateStartNode(newNode);
+    } else {
+      // Target
+      if (
+        grid.isSameNodePosition(grid.targetNode, newNode) || // Nothing to update
+        grid.isSameNodePosition(grid.startNode, newNode) // Cannot set startNode as targetNode
+      ) {
+        return;
+      }
+      grid.updateTargetNode(newNode);
+    }
+
+    if (previousNode !== null) {
+      // if(!isUpdateNode) {
+      switch (previousNode.type) {
+        case NodeType.Unreachable:
+          grid.setNode(
+            new Node(
+              previousNode.rowIndex,
+              previousNode.columnIndex,
+              Infinity,
+              NodeType.Unreachable
+            )
+          );
+          break;
+        case NodeType.Wall:
+          grid.addWall(previousNode.rowIndex, previousNode.columnIndex);
+          break;
+        case NodeType.Weight:
+          grid.addWeight(previousNode.rowIndex, previousNode.columnIndex);
+          break;
+      }
+      // }
+    }
+
+    // setPreviousNode(grid.getNode(rowIndex, columnIndex));
+
+    // If the animation is completed just update the path
+    clearSearchPath();
+    if (isAnimationCompleted && !isAnimationRunning) {
       generateSearchAnimation(
         searchAlgorithmSelected,
         isAnimationRunning,
@@ -305,6 +429,14 @@ export const PathfinderVisualizerProvider = ({
     setIsMousePressed,
     lastMousePressedPosition,
     setLastMousePressedPosition,
+    isWeightKeyPressed,
+    setIsWeightKeyPressed,
+    isStartNodeDragged,
+    setIsStartNodeDragged,
+    isUpdateNode,
+    setIsUpdateNode,
+    previousNode,
+    setPreviousNode,
     // Variables
     requiresReset,
     // ---> Functions
@@ -318,6 +450,7 @@ export const PathfinderVisualizerProvider = ({
     stopAnimation,
     // Node
     updateNode,
+    updateStartOrTargetNode,
   };
 
   // Return the Provider on our context

@@ -7,7 +7,8 @@ import NodeComponent from "../node/Node";
 
 export default function GridComponent() {
   // Use context
-  const { grid, setIsMousePressed } = usePathfinderVisualizerContext();
+  const { grid, setIsMousePressed } =
+    usePathfinderVisualizerContext();
 
   // -----> Handle functions <-----
   const handleOnMouseLeave = () => {

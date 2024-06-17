@@ -36,12 +36,12 @@
 }
 
 .node-weight {
-  background-color: theme("colors.system.purple30");
   background-image: url("/weight.svg");
+  background-color: theme("colors.system.purple30");
 }
 
 .node-unreachable {
-  background-image:none;
+  /* background-image:none; */
   background-color: theme("colors.system.purple30");
   opacity: 0.25;
 }

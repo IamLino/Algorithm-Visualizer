@@ -1,64 +1,68 @@
 import { AnimationSearchType } from "@/app/graphs/lib/animations/animationTypes";
 import { reconstructPath } from "@/app/graphs/lib/animations/animationUtils";
-import { Grid, Node, NodeType } from "@/app/graphs/lib/graphTypes";
+import { Grid, Node, NodeType, NodeWeightValue } from "@/app/graphs/lib/graphTypes";
 
 function runAStar(grid: Grid, animations: AnimationSearchType): void {
   // Initialize
-  const openSet: Set<Node> = new Set<Node>();
-  const closedSet: Set<Node> = new Set<Node>();
-  const cameFrom: Map<Node, Node> = new Map<Node, Node>();
+  const openSet: Set<Node> = new Set<Node>(); // Nodes to be evaluated
+  const closedSet: Set<Node> = new Set<Node>(); // Nodes already evaluated
+  const cameFrom: Map<Node, Node> = new Map<Node, Node>(); // Map of navigated nodes
 
+  // Add the start node to the open set
   openSet.add(grid.startNode);
 
+  // Initialize the start node's weight (distance from start)
+  grid.startNode.weight = 0;
+
   while (openSet.size > 0) {
-    // Get the node with the less total cost (f = g + h)
+    // Get the node in the open set with the lowest f score (f = g + h)
     let currentNode: Node | null = null;
-    openSet.forEach((node) => {
-      if (
-        currentNode === null ||
-        node.weight + grid.calculateEuclideanDistance(node, grid.targetNode) <
-          currentNode.weight +
-            grid.calculateEuclideanDistance(currentNode, grid.targetNode)
-      ) {
+    for (const node of openSet) {
+      if (!currentNode || node.weight + grid.calculateEuclideanDistance(node, grid.targetNode) < currentNode.weight + grid.calculateEuclideanDistance(currentNode, grid.targetNode)) {
         currentNode = node;
       }
-    });
+    }
 
-    if (currentNode === null) break;
+    if (!currentNode) break;
 
-    // If we reach the target node reconstruct the path
+    // If we reach the target node, reconstruct the shortest path
     if (currentNode === grid.targetNode) {
       reconstructPath(cameFrom, currentNode, animations);
       return;
     }
 
-    // Move the current node from the open set to the closed
+    // Move the current node from the open set to the closed set
     openSet.delete(currentNode);
     closedSet.add(currentNode);
     animations.visitedNodes.push(currentNode);
 
-    // Explore the valid neighbors
+    // Explore neighbors
     const neighbors = grid.getValidNeighbors(currentNode);
     for (const neighbor of neighbors) {
       if (closedSet.has(neighbor)) {
-        continue;
+        continue; // Skip nodes that have already been evaluated
       }
 
-      const tentative_gScore = currentNode.weight + 1;
-
-      if (!openSet.has(neighbor)) {
-        openSet.add(neighbor);
-      } else if (tentative_gScore >= neighbor.weight) {
-        continue;
+      // Calculate tentative g score, including additional cost for Weight nodes
+      let additionalCost = 1;
+      if (neighbor.type === NodeType.Weight) {
+        additionalCost += NodeWeightValue;
       }
+      const tentative_gScore = currentNode.weight + additionalCost;
 
-      // This is the best path so far
-      cameFrom.set(neighbor, currentNode);
-      neighbor.weight = tentative_gScore;
+      // Discover a new node or find a better path to the neighbor
+      if (!openSet.has(neighbor) || tentative_gScore < neighbor.weight) {
+        cameFrom.set(neighbor, currentNode);
+        neighbor.weight = tentative_gScore;
+
+        if (!openSet.has(neighbor)) {
+          openSet.add(neighbor);
+        }
+      }
     }
   }
 
-  // Path not found
+  // If we reach here, there is no path
   animations.shortestPath = [];
 }
 
@@ -77,7 +81,9 @@ export function generateAStarSearchAnimation(
     shortestPath: [],
   };
 
-  // Animation
+  // Run A* algorithm
   runAStar(tempGrid, animations);
+
+  // Execute animation
   runAnimation(animations);
 }

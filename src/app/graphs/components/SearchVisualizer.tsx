@@ -33,20 +33,16 @@ export default function PathfinderVisualizer() {
     isWeightValueShown,
     requiresReset,
     searchAlgorithmSelected,
-    // States
-    setGrid,
     setAnimationSpeed,
     setIsWeightValueShown,
+    setIsWeightKeyPressed,
     setSearchAlgorithmSelected,
     setIsAnimationCompleted,
-    // Functions
-    // Grid
-    resetGridAndAnimation,
     clearWallsAndGrid,
     clearSearchPath,
     // Animation
     runSearchAnimation,
-    stopAnimation
+    stopAnimation,
   } = usePathfinderVisualizerContext();
 
   // -----> Handle functions <-----
@@ -59,7 +55,7 @@ export default function PathfinderVisualizer() {
   };
 
   const handleSearch = () => {
-    if(isAnimationRunning){
+    if (isAnimationRunning) {
       // Stop animation
       stopAnimation();
       return;
