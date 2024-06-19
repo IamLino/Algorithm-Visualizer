@@ -19,6 +19,8 @@ import {
 import { SortingAlgorithmType } from "@/app/arrays/lib/arrayTypes";
 import AlgorithmInformation from "@/app/components/ui/AlgorithmInformation";
 import FlowControls from "@/app/components/ui/FlowControls";
+import Tooltip from "@/app/components/ui/tooltip/Tooltip";
+import Return from "@/app/components/ui/Return";
 // <-----------/Imports ----------->
 
 export default function SortingVisualizer() {
@@ -68,8 +70,9 @@ export default function SortingVisualizer() {
       >
         {/* Header, Controls & Algorithm Information */}
         <div className="h-[66px] relative flex items-center justify-between w-full">
-          <h1 className="text-gray-300 text-2xl font-light hidden md:flex">
-            Sorting Algorithm Visualizer by Lino
+          <Return />
+          <h1 className="ml-1 mr-auto text-gray-300 text-2xl font-light hidden md:flex">
+            Sorting Algorithm Visualizer
           </h1>
           <div className="flex items-center justify-center gap-4">
             <SpeedSlider
@@ -83,11 +86,21 @@ export default function SortingVisualizer() {
               isDisable={isAnimationRunning}
               onChange={handleAlgorithmSelectorChange}
             />
-            <FlowControls
-              requiresReset={requiresReset}
-              isAnimationRunning={isAnimationRunning}
-              handleSorting={handleSorting}
-            />
+            <Tooltip
+              infoText={
+                ! requiresReset
+                  ? `Run sorting`
+                  : isAnimationRunning
+                  ? `Stop Animation`
+                  : `Randomize Array`
+              }
+            >
+              <FlowControls
+                requiresReset={requiresReset}
+                isAnimationRunning={isAnimationRunning}
+                handleSorting={handleSorting}
+              />
+            </Tooltip>
           </div>
 
           <div className="hidden sm:flex absolute top-[120%] left-0 w-full">

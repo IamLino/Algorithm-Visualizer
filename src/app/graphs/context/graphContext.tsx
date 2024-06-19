@@ -55,6 +55,14 @@ interface PathfinderVisualizerContextType {
   isAnimationCompleted: boolean;
   setIsAnimationCompleted: (isCompleted: boolean) => void;
   requiresReset: boolean;
+  // Path
+  visitedNodesCount: number;
+  setVisitedNodesCount: (count: number) => void;
+  shortestPathWeightCost: number;
+  setShortestPathWeightCost: (totalCost: number) => void;
+  // Variable
+  hasExecuted: boolean;
+  setHasExecuted: (hasExecuted: boolean) => void;
   // ---> Functions
   // Grid
   resetGridAndAnimation: () => void;
@@ -108,6 +116,12 @@ export const PathfinderVisualizerProvider = ({
   const [isUpdateNode, setIsUpdateNode] = useState<boolean>(false);
   // Previous Node
   const [previousNode, setPreviousNode] = useState<Node | null>(null);
+  // Path
+  const [visitedNodesCount, setVisitedNodesCount] = useState<number>(0);
+  const [shortestPathWeightCost, setShortestPathWeightCost] =
+    useState<number>(0);
+  // Variables
+  const [hasExecuted, setHasExecuted] = useState<boolean>(false);
   // <----------/States ---------->
 
   // Flag that determines whether
@@ -222,16 +236,14 @@ export const PathfinderVisualizerProvider = ({
         updateNodeClass(node, true, isAnimationRunning);
       }, index * inverseSpeed);
     });
-
     // Animate the shortest path
     const shortestPathTimeout = animations.shortestPath.length * inverseSpeed;
     setTimeout(() => {
       animations.shortestPath.forEach((node, index) => {
-        let additionalWeight = 1;
+        shortestPathCost += 1;
         if (node.type == NodeType.Weight) {
-          additionalWeight += NodeWeightValue;
+          shortestPathCost += NodeWeightValue;
         }
-        shortestPathCost += additionalWeight;
         setTimeout(() => {
           updateNodeClass(node, false, isAnimationRunning);
           // After the start node
@@ -248,6 +260,9 @@ export const PathfinderVisualizerProvider = ({
     setTimeout(() => {
       setIsAnimationRunning(false);
       setIsAnimationCompleted(true);
+      // Set path variables
+      setVisitedNodesCount(animations.visitedNodes.length); // Without start
+      setShortestPathWeightCost(shortestPathCost - 1);
     }, visitedNodesTimeout + shortestPathTimeout);
 
     // ---> Reset clearing timeout so the animation stops
@@ -259,6 +274,16 @@ export const PathfinderVisualizerProvider = ({
   };
 
   const updateSearchAnimation = (animations: AnimationSearchType) => {
+    let shortestPathCost = 0;
+    animations.shortestPath.forEach((node) => {
+      shortestPathCost += 1;
+      if (node.type == NodeType.Weight) {
+        shortestPathCost += NodeWeightValue;
+      }
+    });
+    // Set path variables
+    setVisitedNodesCount(animations.visitedNodes.length); // Without start
+    setShortestPathWeightCost(shortestPathCost - 1);
     // Clear the previous search path
     stopAnimation();
     // Change the nodes in the animations arrays (visitedNodes & shortestPath)
@@ -437,8 +462,15 @@ export const PathfinderVisualizerProvider = ({
     setIsUpdateNode,
     previousNode,
     setPreviousNode,
+    // Path
+    visitedNodesCount,
+    setVisitedNodesCount,
+    shortestPathWeightCost,
+    setShortestPathWeightCost,
     // Variables
     requiresReset,
+    hasExecuted,
+    setHasExecuted,
     // ---> Functions
     // Grid
     resetGridAndAnimation,

@@ -35,6 +35,8 @@ export default function NodeComponent({
     isUpdateNode,
     setIsUpdateNode,
     updateStartOrTargetNode,
+    hasExecuted,
+    setHasExecuted,
   } = usePathfinderVisualizerContext();
 
   // -----> Handle functions <-----
@@ -96,10 +98,20 @@ export default function NodeComponent({
     ) {
       return;
     }
+    // ---> States
+    // if(previousNode?.rowIndex !== node.rowIndex ||
+    //   previousNode?.columnIndex !== node.columnIndex)
+    //   {
+    //     setHasExecuted(false);
+    // }
     setIsUpdateNode(false);
     // ! TODO: Only call the updateStartOrTargetNode once
-    updateStartOrTargetNode(node.rowIndex, node.columnIndex);
+    if(!hasExecuted){
+      updateStartOrTargetNode(node.rowIndex, node.columnIndex);
+      setHasExecuted(true);
+    }
     setPreviousNode(node);
+    setHasExecuted(false);
   };
   const handleOnDrop = (e: React.DragEvent) => {
     e.preventDefault();
@@ -140,7 +152,7 @@ export default function NodeComponent({
       {isWeightValueShown && (
         <span
           id={`node-${node.rowIndex}-${node.columnIndex}-weight`}
-          className="text-xs flex items-center justify-center select-none"
+          className="text-[10px] text-gray-500 flex items-center justify-center select-none"
         >
           {getNodeWeightText(node.weight, node.type)}
         </span>

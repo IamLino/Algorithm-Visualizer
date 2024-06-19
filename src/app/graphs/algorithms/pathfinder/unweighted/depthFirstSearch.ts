@@ -1,74 +1,93 @@
-import { AnimationSearchType, Grid, Node, NodeType } from "../lib/graphTypes";
+import { AnimationSearchType } from "@/app/graphs/lib/animations/animationTypes";
+import { Grid, Node, NodeType } from "@/app/graphs/lib/graphTypes";
 
-function runDFSSearch(grid: Grid, animations: AnimationSearchType) {
-    const visitedNodes: Node[] = [];
-    const previousNodes: (Node | null)[][] = Array.from({ length: grid.numRows }, () => Array(grid.numColumns).fill(null));
-    const stack: Node[] = [];
+function runDFS(grid: Grid, animations: AnimationSearchType): void {
+  const stack: Node[] = [];
+  const cameFrom: Map<Node, Node> = new Map<Node, Node>();
+  const visited: Set<Node> = new Set<Node>();
 
-    const startNode = grid.startNode;
-    const targetNode = grid.targetNode;
+  stack.push(grid.startNode);
 
-    stack.push(startNode);
+  while (stack.length > 0) {
+    const currentNode = stack.pop();
+    if (!currentNode) continue;
 
-    while (stack.length > 0) {
-        const currentNode = stack.pop();
-
-        if (currentNode === undefined) break;
-
-        if (currentNode.type === NodeType.Wall) continue;
-
-        if (currentNode.isVisited) continue;
-        currentNode.isVisited = true;
-
-        visitedNodes.push(currentNode);
-        animations.visitedNodes.push(currentNode);
-
-        if (currentNode === targetNode) break;
-
-        const neighbors = grid.getValidNeighbors(currentNode);
-
-        for (const neighbor of neighbors) {
-            if (!neighbor.isVisited && previousNodes[neighbor.rowIndex][neighbor.columnIndex] === null) {
-                stack.push(neighbor);
-                previousNodes[neighbor.rowIndex][neighbor.columnIndex] = currentNode;
-            }
-        }
+    if (visited.has(currentNode)) {
+      continue;
     }
 
-    animations.shortestPath = reconstructPath(previousNodes, startNode, targetNode);
+    visited.add(currentNode);
+    animations.visitedNodes.push(currentNode);
+
+    // If we reach the target node, reconstruct the path
+    if (currentNode === grid.targetNode) {
+      reconstructPath(cameFrom, currentNode, animations);
+      return;
+    }
+
+    const neighbors = getOrderedNeighbors(grid, currentNode);
+
+    for (const neighbor of neighbors) {
+      if (!visited.has(neighbor) && !grid.isWall(neighbor.rowIndex, neighbor.columnIndex)) {
+        stack.push(neighbor);
+        cameFrom.set(neighbor, currentNode);
+      }
+    }
+  }
+
+  // Path not found
+  animations.shortestPath = [];
 }
 
-function reconstructPath(previousNodes: (Node | null)[][], startNode: Node, targetNode: Node): Node[] {
-    const path: Node[] = [];
-    let currentNode: Node | null = previousNodes[targetNode.rowIndex][targetNode.columnIndex];
+function getOrderedNeighbors(grid: Grid, node: Node): Node[] {
+  const neighbors: Node[] = [];
+  const directions = [
+    { row: -1, col: 0 },  // Up
+    { row: 0, col: -1 },  // Left
+    { row: 0, col: 1 },   // Right
+    { row: 1, col: 0 }    // Down
+  ];
 
-    while (currentNode !== null && currentNode !== startNode) {
-        path.unshift(currentNode);
-        currentNode = previousNodes[currentNode.rowIndex][currentNode.columnIndex];
+  for (const direction of directions) {
+    const neighborRow = node.rowIndex + direction.row;
+    const neighborCol = node.columnIndex + direction.col;
+
+    if (grid.isValidPosition(neighborRow, neighborCol)) {
+      neighbors.push(grid.getNode(neighborRow, neighborCol));
     }
+  }
 
-    if (currentNode === startNode) {
-        path.unshift(startNode);
-        path.push(targetNode);
-    }
+  return neighbors;
+}
 
-    return path;
+function reconstructPath(cameFrom: Map<Node, Node>, currentNode: Node, animations: AnimationSearchType): void {
+  const path: Node[] = [];
+  let temp: Node | undefined = currentNode;
+
+  while (temp !== undefined) {
+    path.unshift(temp);
+    temp = cameFrom.get(temp);
+  }
+
+  animations.shortestPath = path;
 }
 
 export function generateDFSSearchAnimation(
-    isAnimationRunning: boolean,
-    grid: Grid,
-    runAnimation: (animations: AnimationSearchType) => void,
+  isAnimationRunning: boolean,
+  grid: Grid,
+  runAnimation: (animations: AnimationSearchType) => void
 ) {
-    // Guards
-    if (isAnimationRunning) return;
+  // Guards
+  if (isAnimationRunning) return;
 
-    const tempGrid = grid;
-    const animations: AnimationSearchType = {
-        visitedNodes: [],
-        shortestPath: []
-    };
+  // Initialize
+  const tempGrid = grid;
+  const animations: AnimationSearchType = {
+    visitedNodes: [],
+    shortestPath: [],
+  };
 
-    runDFSSearch(tempGrid, animations);
-    runAnimation(animations);
+  // Animation
+  runDFS(tempGrid, animations);
+  runAnimation(animations);
 }

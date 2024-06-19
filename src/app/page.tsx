@@ -9,7 +9,7 @@ export default function Home() {
         {/* First Row (Header & Controls) */}
         <div className="h-[66px] relative flex items-center justify-between w-full">
           <h1 className="text-gray-300 text-2xl font-light hidden md:flex">
-            Sorting Algorithm Visualizer by Lino
+            Algorithm Visualizer by Lino
           </h1>
           <div className="flex items-center justify-center gap-4"></div>
           <div className="hidden sm:flex absolute top-[120%] left-0 w-full">

@@ -9,6 +9,8 @@ import FlowControls from "@/app/components/ui/FlowControls";
 import SpeedSlider from "@/app/components/input/SpeedSlider";
 import AlgorithmSelector from "@/app/components/input/AlgorithmSelector";
 import AlgorithmInformation from "@/app/components/ui/AlgorithmInformation";
+import { FaWeightHanging } from "react-icons/fa";
+import Tooltip from "../../components/ui/tooltip/Tooltip";
 // Grid
 import GridComponent from "./grid/Grid";
 // Graph
@@ -19,7 +21,8 @@ import {
 } from "../lib/graphUtils";
 // Animation
 import { SearchAlgorithmType } from "../lib/animations/animationTypes";
-import { updateSearchPath } from "../animations/grid/gridAnimations";
+import SearchPathInformation from "./ui/SearchPathInformation/SearchPathInformation";
+import Return from "@/app/components/ui/Return";
 // <-----------/Imports ----------->
 
 export default function PathfinderVisualizer() {
@@ -40,6 +43,9 @@ export default function PathfinderVisualizer() {
     setIsAnimationCompleted,
     clearWallsAndGrid,
     clearSearchPath,
+    // Path
+    visitedNodesCount,
+    shortestPathWeightCost,
     // Animation
     runSearchAnimation,
     stopAnimation,
@@ -94,22 +100,11 @@ export default function PathfinderVisualizer() {
       >
         {/* Header, Controls & Algorithm Information */}
         <div className="h-[66px] relative flex items-center justify-between w-full">
-          <h1 className="text-gray-300 text-2xl font-light hidden md:flex">
-            Pathfinder Visualizer by Lino
+          <Return />
+          <h1 className="ml-1 mr-auto text-gray-300 text-2xl font-light hidden md:flex">
+            Pathfinder Visualizer
           </h1>
           <div className="flex items-center justify-center gap-4">
-            <button
-              className="flex items-center justify-center"
-              onClick={handleClearGrid}
-              disabled={isAnimationRunning}
-            >
-              <AiOutlineClear className="text-gray-400 h-6 w-8" />
-            </button>
-            <input
-              type="checkbox"
-              checked={isWeightValueShown}
-              onChange={handleShowWeightValue}
-            />
             <SpeedSlider
               value={animationSpeed}
               isDisable={isAnimationRunning}
@@ -121,11 +116,42 @@ export default function PathfinderVisualizer() {
               isDisable={isAnimationRunning}
               onChange={handleAlgorithmSelectorChange}
             />
-            <FlowControls
-              requiresReset={requiresReset}
-              isAnimationRunning={isAnimationRunning}
-              handleSorting={handleSearch}
-            />
+            <Tooltip
+              infoText={`${isWeightValueShown ? `Hide` : `Show`} Weight Value`}
+            >
+              <button
+                className="flex items-center justify-center"
+                onClick={handleShowWeightValue}
+                // disabled={isAnimationRunning}
+              >
+                <FaWeightHanging className="text-gray-400 h-5 w-8" />
+              </button>
+            </Tooltip>
+            <Tooltip infoText="Clear grid">
+              <button
+                className="flex items-center justify-center"
+                onClick={handleClearGrid}
+                disabled={isAnimationRunning}
+              >
+                <AiOutlineClear className="text-gray-400 h-6 w-8" />
+              </button>
+            </Tooltip>
+            <Tooltip
+              infoText={
+                !requiresReset
+                  ? `Run search`
+                  : isAnimationCompleted
+                  ? `Clear path`
+                  : `Stop Animation`
+              }
+            >
+              <FlowControls
+                requiresReset={requiresReset}
+                isAnimationRunning={isAnimationRunning}
+                handleSorting={handleSearch}
+              />
+            </Tooltip>
+            {/* <GridSettings /> */}
           </div>
 
           <div className="hidden sm:flex absolute top-[120%] left-0 w-full">
@@ -137,6 +163,14 @@ export default function PathfinderVisualizer() {
 
         {/* Visualizer */}
         <div className="relative h-[calc(100vh-66px)] w-full">
+          {isAnimationCompleted && (
+            <div className="absolute top-[165px] w-full mx-auto left-0 right-0 flex flex-col justify-center items-center">
+              <SearchPathInformation
+                visitedNodesCount={visitedNodesCount}
+                shortestPathWeight={shortestPathWeightCost}
+              />
+            </div>
+          )}
           <div className="absolute bottom-[32px] w-full mx-auto left-0 right-0 flex flex-col justify-center items-center">
             <GridComponent />
           </div>

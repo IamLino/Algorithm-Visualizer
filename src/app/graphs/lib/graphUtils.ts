@@ -10,14 +10,18 @@ import { generateAStarSearchAnimation } from "../algorithms/pathfinder/weighted/
 import { generateGreedyBFSearchAnimation } from "../algorithms/pathfinder/weighted/greedyBFSearch";
 // Unweighted
 // Animation
-import { SearchAlgorithmType, AnimationSearchType } from "./animations/animationTypes";
+import {
+  SearchAlgorithmType,
+  AnimationSearchType,
+} from "./animations/animationTypes";
+import { generateDFSSearchAnimation } from "../algorithms/pathfinder/unweighted/depthFirstSearch";
 // <-----------/Imports ----------->
 
 export const searchAlgorithmSelectorOptions: AlgorithmSelectorOptions[] = [
   { label: "Dijkstra's", value: "dijkstras" },
   { label: "A*", value: "a_star" },
   { label: "Greedy BFS", value: "greedy_bfs" },
-  // { label: "DFS", value: "dfs" },
+  { label: "DFS", value: "dfs" },
 ];
 
 export function generateSearchAnimation(
@@ -36,13 +40,13 @@ export function generateSearchAnimation(
     case "greedy_bfs":
       generateGreedyBFSearchAnimation(isAnimationRunning, grid, runAnimation);
       break;
-    // case "dfs":
-    //   generateDFSSearchAnimation(isAnimationRunning, grid, runAnimation);
-    //   break;
+    case "dfs":
+      generateDFSSearchAnimation(isAnimationRunning, grid, runAnimation);
+      break;
     default:
       break;
-  };
-};
+  }
+}
 
 export const searchAlgorithmsData: { [key: string]: AlgorithmData } = {
   dijkstras: {
@@ -68,14 +72,13 @@ export const searchAlgorithmsData: { [key: string]: AlgorithmData } = {
     worstCase: "O(b^d)",
     averageCase: "O(b^d)",
     bestCase: "O(b^d)",
-  }
-
-  // dfs: {
-  //   title: "Merge Sort",
-  //   description:
-  //     "Merge sort divides the unsorted list into n sub-lists, each containing one element (a list of one element is considered sorted), and then repeatedly merges these sub-lists to produce new sorted sub-lists until there is only one sub-list remaining, which is the sorted list. This algorithm uses a divide-and-conquer approach, splitting the list in half recursively and merging the sorted halves back together.",
-  //   worstCase: "O(n log n)",
-  //   averageCase: "O(n log n)",
-  //   bestCase: "O(n log n)",
-  // }
+  },
+  dfs: {
+    title: "Depth-First Search (DFS)",
+    description:
+      "Depth-First Search (DFS) is an algorithm for traversing or searching tree or graph data structures. The algorithm starts at the root (selecting some arbitrary node as the root in the case of a graph) and explores as far as possible along each branch before backtracking. It uses a stack to remember to get the next vertex to start a search when a dead end occurs in any iteration.",
+    worstCase: "O(V + E)",
+    averageCase: "O(V + E)",
+    bestCase: "O(V + E)",
+  },
 };
