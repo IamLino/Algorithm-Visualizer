@@ -106,7 +106,7 @@ export default function NodeComponent({
     // }
     setIsUpdateNode(false);
     // ! TODO: Only call the updateStartOrTargetNode once
-    if(!hasExecuted){
+    if (!hasExecuted) {
       updateStartOrTargetNode(node.rowIndex, node.columnIndex);
       setHasExecuted(true);
     }
@@ -150,13 +150,13 @@ export default function NodeComponent({
       onDrop={handleOnDrop}
     >
       {isWeightValueShown && (
-        <span
-          id={`node-${node.rowIndex}-${node.columnIndex}-weight`}
-          className="text-[10px] text-gray-500 flex items-center justify-center select-none"
-        >
-          {getNodeWeightText(node.weight, node.type)}
-        </span>
-      )}
+          <span
+            id={`node-${node.rowIndex}-${node.columnIndex}-weight`}
+            className="text-[10px] text-gray-500 flex items-center justify-center select-none"
+          >
+            {getNodeWeightText(node.weight, node.type)}
+          </span>
+        )}
     </div>
   );
 }

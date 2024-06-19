@@ -117,7 +117,7 @@ export default function PathfinderVisualizer() {
               onChange={handleAlgorithmSelectorChange}
             />
             <Tooltip
-              infoText={`${isWeightValueShown ? `Hide` : `Show`} Weight Value`}
+              infoText={`${isWeightValueShown ? `Hide` : `Show`} weight value`}
             >
               <button
                 className="flex items-center justify-center"
@@ -142,7 +142,7 @@ export default function PathfinderVisualizer() {
                   ? `Run search`
                   : isAnimationCompleted
                   ? `Clear path`
-                  : `Stop Animation`
+                  : `Stop animation`
               }
             >
               <FlowControls

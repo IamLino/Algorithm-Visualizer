@@ -43,6 +43,10 @@ export function getNodeWeightText(weight: number, nodeType: NodeType): string {
     case NodeType.Unreachable:
       weightText = "-";
       break;
+    case NodeType.Start:
+      break;
+    // case NodeType.Target:
+    //   break;
     default:
       if (weight === Infinity) {
         weightText = "NA";

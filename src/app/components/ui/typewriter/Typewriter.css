@@ -1,0 +1,56 @@
+:root {
+  --typewriterSpeed: 6s;
+}
+
+.typewriter-container {
+  margin: 0;
+  min-height: 100vh;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  background: none;
+}
+
+.typewriter-container h1 {
+  /* font-size: clamp(1rem, 3vw + 1rem, 4rem); */
+  position: relative;
+  width: max-content;
+  /* visibility: hidden; */
+}
+
+.typewriter-container h1::before,
+.typewriter-container h1::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  /* visibility: visible; */
+}
+
+.typewriter-container h1::before {
+  background: theme("colors.system.purple10");
+  animation: typewriter var(--typewriterSpeed)
+    steps(var(--typewriterCharacters)) 1s forwards;
+}
+
+.typewriter-container h1::after {
+  width: 0.125em;
+  background: theme("colors.system.purple50");
+  animation: typewriter var(--typewriterSpeed)
+      steps(var(--typewriterCharacters)) 1s forwards,
+    blink 750ms steps(var(--typewriterCharacters)) infinite;
+}
+
+@keyframes typewriter {
+  to {
+    left: 100%;
+  }
+}
+
+@keyframes blink {
+  to {
+    background: transparent;
+  }
+}

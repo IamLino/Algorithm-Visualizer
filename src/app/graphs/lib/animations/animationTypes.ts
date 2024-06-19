@@ -1,3 +1,5 @@
+import {Node} from "../graphTypes";
+
 export type SearchAlgorithmType =
     // Weighted
     "dijkstras" |
