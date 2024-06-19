@@ -10,7 +10,7 @@ export default function Home() {
         id="data-structure-container"
         className="max-w-[1020px] w-full flex items-center justify-center"
       >
-        <div className="h-[66px] relative flex items-center justify-center w-full ">
+        <div className="relative flex items-center justify-center w-full ">
           <div className="hidden sm:flex absolute top-[50%] left-0 transform -translate-y-1/2 w-full items-center justify-center">
             <div className="flex h-[250px] w-[900px] items-center justify-center text-gray-400 p-4 rounded border border-system-purple20 bg-system-purple80 bg-opacity-10 gap-2">
               <div className="flex flex-col items-center justify-center">

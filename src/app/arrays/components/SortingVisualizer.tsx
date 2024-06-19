@@ -91,8 +91,8 @@ export default function SortingVisualizer() {
                 ! requiresReset
                   ? `Run sorting`
                   : isAnimationRunning
-                  ? `Stop Animation`
-                  : `Randomize Array`
+                  ? `Stop animation`
+                  : `Randomize array`
               }
             >
               <FlowControls
