@@ -1,9 +1,18 @@
-# Sorting Algorithm Visualizer
+# Algorithm Visualizer
 
-A sorting algorithm visualizer with algorithm's such as:
+A sorting visualizer and a pathfinder visualizer.
+
+Sorting algorithm's:
 
 - Bubble
 - Merge
 - Quick
 - Selection
 - Insertion
+
+Pathfinder algorithm's:
+
+- Djikstra's
+- A*
+- Greedy BFS
+- DFS
